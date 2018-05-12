@@ -10,8 +10,8 @@ import org.bukkit.plugin.java.JavaPlugin;
  * The main plugin class.
  * Created by SecondAmendment on 5/11/2018.
  */
-public class MinecraftVNCPlugin extends JavaPlugin implements Listener {
-    @Getter private static MinecraftVNCPlugin instance;
+public class VNCraft extends JavaPlugin implements Listener {
+    @Getter private static VNCraft instance;
 
     @Override
     public void onEnable() {

@@ -1,7 +1,8 @@
-name: MinecraftVNC
-main: com.caetsamuel.gmail.MinecraftVNCPlugin
+name: VNCraft
+main: com.caetsamuel.gmail.VNCraft
 description: VNC in Minecraft
-author: SecondAmendment
+author: SecondAmendment, Kneesnap
 version: 1.0
 
 softdepend: [PacketListenerApi, MapManager]
+depend: [AnimatedFrames]
