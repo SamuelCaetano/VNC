@@ -1,0 +1,13 @@
+<component name="libraryTable">
+  <library name="Maven: org.inventivetalent:mapmanager:1.4.1-SNAPSHOT">
+    <CLASSES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/inventivetalent/mapmanager/1.4.1-SNAPSHOT/mapmanager-1.4.1-20180317.160903-2.jar!/" />
+    </CLASSES>
+    <JAVADOC>
+      <root url="jar://$MAVEN_REPOSITORY$/org/inventivetalent/mapmanager/1.4.1-SNAPSHOT/mapmanager-1.4.1-20180317.160903-2-javadoc.jar!/" />
+    </JAVADOC>
+    <SOURCES>
+      <root url="jar://$MAVEN_REPOSITORY$/org/inventivetalent/mapmanager/1.4.1-SNAPSHOT/mapmanager-1.4.1-20180317.160903-2-sources.jar!/" />
+    </SOURCES>
+  </library>
+</component>

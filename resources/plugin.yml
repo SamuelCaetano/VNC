@@ -1,0 +1,7 @@
+name: MinecraftVNC
+main: com.caetsamuel.gmail.MinecraftVNCPlugin
+description: VNC in Minecraft
+author: SecondAmendment
+version: 1.0
+
+softdepend: [PacketListenerApi, MapManager]

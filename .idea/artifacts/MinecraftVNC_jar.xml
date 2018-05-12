@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="MinecraftVNC:jar">
+    <output-path>$PROJECT_DIR$/out</output-path>
+    <root id="archive" name="MinecraftVNC.jar">
+      <element id="module-output" name="MinecraftVNC" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/inventivetalent/packetlistener/api/3.6.0-SNAPSHOT/api-3.6.0-20170616.213046-2.jar" path-in-jar="/" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/inventivetalent/mapmanager/1.4.1-SNAPSHOT/mapmanager-1.4.1-20180317.160903-2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>
