@@ -1,27 +1,21 @@
 package com.caetsamuel.gmail;
 
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.inventivetalent.animatedframes.AnimatedFrame;
-import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
 
+/**
+ * The main plugin class.
+ * Created by SecondAmendment on 5/11/2018.
+ */
 public class MinecraftVNCPlugin extends JavaPlugin implements Listener {
-
-    private static MinecraftVNCPlugin instance;
-    private ConsoleCommandSender console;
-
-    boolean doOnce = true;
+    @Getter private static MinecraftVNCPlugin instance;
 
     @Override
     public void onEnable() {
         instance = this;
-        console = getServer().getConsoleSender();
 
         if (!Bukkit.getPluginManager().isPluginEnabled("MapManager")) {
             getLogger().warning("**************************************************");
@@ -34,33 +28,9 @@ public class MinecraftVNCPlugin extends JavaPlugin implements Listener {
             return;
         }
         else{
-            console.sendMessage(ChatColor.GREEN + "MinecraftVNC has been initialized!");
+            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "MinecraftVNC has been initialized!");
         }
 
-        getServer().getPluginManager().registerEvents(instance, this);
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-    }
-
-    @Override
-    public void onDisable() {
-        super.onDisable();
-    }
-
-    public static MinecraftVNCPlugin getInstance(){
-        return instance;
-    }
-
-    @EventHandler
-    public void onText(PlayerEggThrowEvent event){
-        System.out.println("THIS WORKED!");
-        if(doOnce = true) {
-            AnimatedFramesPlugin plugin = (AnimatedFramesPlugin) Bukkit.getPluginManager().getPlugin("AnimatedFrames");
-            VNCScreen test = new VNCScreen(plugin.frameManager.getFrame("screen1"));
-        }
-        doOnce = false;
+        getServer().getPluginManager().registerEvents(getInstance(), this);
     }
 }
