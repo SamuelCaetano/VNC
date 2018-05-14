@@ -1,5 +1,5 @@
 name: MinecraftVNC
-main: com.caetsamuel.gmail.MinecraftVNCPlugin
+main: com.caetsamuel.gmail.VNCraft
 description: VNC in Minecraft
 author: SecondAmendment
 version: 1.0

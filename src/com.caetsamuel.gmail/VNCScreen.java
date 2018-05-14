@@ -4,11 +4,8 @@ import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.World;
-import org.bukkit.block.Block;
-import org.bukkit.entity.Entity;
-import org.bukkit.entity.Hanging;
-import org.bukkit.entity.ItemFrame;
-import org.bukkit.entity.Player;
+import org.bukkit.block.BlockFace;
+import org.bukkit.entity.*;
 import org.inventivetalent.mapmanager.MapManagerPlugin;
 import org.inventivetalent.mapmanager.controller.MapController;
 import org.inventivetalent.mapmanager.manager.MapManager;
@@ -50,13 +47,32 @@ public class VNCScreen implements Runnable {
 
         System.out.println("Spawning FRAMES!");
 
+        int minX = Math.min(f1.getBlockX(), f2.getBlockX());
+        int maxX = Math.max(f1.getBlockX(), f2.getBlockX());
+        int minY = Math.min(f1.getBlockY(), f2.getBlockY());
+        int maxY = Math.max(f1.getBlockY(), f2.getBlockY());
+        int minZ = Math.min(f1.getBlockZ(), f2.getBlockZ());
+        int maxZ = Math.max(f1.getBlockZ(), f2.getBlockZ());
 
-        //This doesnt get run for some reason and skips straight to the try/catch. (So it doesnt spawn the frames or store them in the arraylist)
-        for(int z = 0; z < (f2.getBlockZ() - f1.getBlockZ()); z++) {
-            for (int y = 0; y < (f2.getBlockY() - f1.getBlockY()); y++) {
-                for (int x = 0; x < (f2.getBlockX() - f1.getBlockX()); x++) {
+        Location loc = new Location(world,0, 0, 0);
 
-                    Location loc = new Location(world, f1.getBlockX() + x, f1.getBlockY() + y, f1.getBlockZ() + z);
+        //Add Frames
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    loc.setX(x);
+                    loc.setY(y);
+                    loc.setZ(z);
+
+                    for (Entity entity : world.getNearbyEntities(loc, 2, 2, 2)) {
+                        if (entity instanceof ItemFrame && entity.getLocation().getBlock().getRelative(((ItemFrame) entity).getAttachedFace()).equals(world.getBlockAt(loc))) {
+                            ItemFrame itemFrame = (ItemFrame) entity;
+                            itemFrame.remove();
+                        }
+                    }
+
+                    world.getBlockAt(loc).setType(Material.AIR);
+
                     System.out.println("frame at: " + loc.toString());
 
                     ItemFrame frame = world.spawn(loc, ItemFrame.class);
@@ -127,6 +143,16 @@ public class VNCScreen implements Runnable {
                 }
             }
         }
+    }
+
+    public Entity getEntityByLocation(Location loc){
+        for(Entity e : loc.getWorld().getEntities()){
+            if(e.getLocation().distanceSquared(loc) <= 1.0){
+                System.out.println("ANYTHING HERE: " + e.getType());
+                return e;
+            }
+        }
+        return null;
     }
 
 }
