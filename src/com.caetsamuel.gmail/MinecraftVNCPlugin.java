@@ -1,22 +1,20 @@
 package com.caetsamuel.gmail;
 
+import com.caetsamuel.gmail.commands.TestCommand;
+import com.caetsamuel.gmail.listeners.InteractListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.command.ConsoleCommandSender;
-import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.player.AsyncPlayerChatEvent;
-import org.bukkit.event.player.PlayerEggThrowEvent;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.inventivetalent.animatedframes.AnimatedFrame;
-import org.inventivetalent.animatedframes.AnimatedFramesPlugin;
 
 public class MinecraftVNCPlugin extends JavaPlugin implements Listener {
 
     private static MinecraftVNCPlugin instance;
-    private ConsoleCommandSender console;
 
-    boolean doOnce = true;
+    public InteractListener interactListener;
+
+    private ConsoleCommandSender console;
 
     @Override
     public void onEnable() {
@@ -37,7 +35,11 @@ public class MinecraftVNCPlugin extends JavaPlugin implements Listener {
             console.sendMessage(ChatColor.GREEN + "MinecraftVNC has been initialized!");
         }
 
+        Bukkit.getPluginManager().registerEvents(interactListener = new InteractListener(), this);
+
         getServer().getPluginManager().registerEvents(instance, this);
+
+        instance.getCommand("test").setExecutor(new TestCommand());
     }
 
     @Override
@@ -52,15 +54,5 @@ public class MinecraftVNCPlugin extends JavaPlugin implements Listener {
 
     public static MinecraftVNCPlugin getInstance(){
         return instance;
-    }
-
-    @EventHandler
-    public void onText(PlayerEggThrowEvent event){
-        System.out.println("THIS WORKED!");
-        if(doOnce = true) {
-            AnimatedFramesPlugin plugin = (AnimatedFramesPlugin) Bukkit.getPluginManager().getPlugin("AnimatedFrames");
-            VNCScreen test = new VNCScreen(plugin.frameManager.getFrame("screen1"));
-        }
-        doOnce = false;
     }
 }

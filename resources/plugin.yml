@@ -5,3 +5,8 @@ author: SecondAmendment
 version: 1.0
 
 softdepend: [PacketListenerApi, MapManager]
+
+commands:
+   test:
+      description: Test command
+      usage: /test
