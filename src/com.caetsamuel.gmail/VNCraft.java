@@ -1,21 +1,25 @@
 package com.caetsamuel.gmail;
 
-import lombok.Getter;
+import com.caetsamuel.gmail.commands.TestCommand;
+import com.caetsamuel.gmail.listeners.InteractListener;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
+import org.bukkit.command.ConsoleCommandSender;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
 
-/**
- * The main plugin class.
- * Created by SecondAmendment on 5/11/2018.
- */
 public class VNCraft extends JavaPlugin implements Listener {
-    @Getter private static VNCraft instance;
+
+    private static VNCraft instance;
+
+    public InteractListener interactListener;
+
+    private ConsoleCommandSender console;
 
     @Override
     public void onEnable() {
         instance = this;
+        console = getServer().getConsoleSender();
 
         if (!Bukkit.getPluginManager().isPluginEnabled("MapManager")) {
             getLogger().warning("**************************************************");
@@ -28,9 +32,27 @@ public class VNCraft extends JavaPlugin implements Listener {
             return;
         }
         else{
-            Bukkit.getConsoleSender().sendMessage(ChatColor.GREEN + "MinecraftVNC has been initialized!");
+            console.sendMessage(ChatColor.GREEN + "MinecraftVNC has been initialized!");
         }
 
-        getServer().getPluginManager().registerEvents(getInstance(), this);
+        Bukkit.getPluginManager().registerEvents(interactListener = new InteractListener(), this);
+
+        getServer().getPluginManager().registerEvents(instance, this);
+
+        instance.getCommand("test").setExecutor(new TestCommand());
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+    }
+
+    @Override
+    public void onDisable() {
+        super.onDisable();
+    }
+
+    public static VNCraft getInstance(){
+        return instance;
     }
 }

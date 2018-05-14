@@ -1,7 +1,7 @@
 package com.caetsamuel.gmail.commands;
 
-import com.caetsamuel.gmail.MinecraftVNCPlugin;
 import com.caetsamuel.gmail.VNCScreen;
+import com.caetsamuel.gmail.VNCraft;
 import com.caetsamuel.gmail.util.Callback;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
@@ -16,7 +16,7 @@ import org.bukkit.event.player.PlayerInteractEntityEvent;
 //Used to test the setting of itemframes on a wall.
 public class TestCommand implements CommandExecutor {
 
-    MinecraftVNCPlugin plugin = MinecraftVNCPlugin.getInstance();
+    VNCraft plugin = VNCraft.getInstance();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
