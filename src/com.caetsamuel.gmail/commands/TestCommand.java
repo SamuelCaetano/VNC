@@ -5,6 +5,7 @@ import com.caetsamuel.gmail.VNCraft;
 import com.caetsamuel.gmail.util.Callback;
 import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -53,7 +54,8 @@ public class TestCommand implements CommandExecutor {
                                                 player.sendMessage("Setup Complete!");
                                                 player.sendMessage("  ");
 
-                                                VNCScreen screen = new VNCScreen(block1.getLocation(), block2.getLocation());
+                                                BlockFace bf = event.getBlockFace();
+                                                VNCScreen screen = new VNCScreen(block1.getLocation(), block2.getLocation(), bf);
                                             }
                                         }
                                     });
