@@ -99,9 +99,8 @@ public class VNCScreen implements Runnable {
         }
 
         try {
-//robot.createScreenCapture(new Rectangle(1920, 1080))
             Player player = Bukkit.getPlayer("SecondAmendment");
-            MapWrapper mapWrapper = mapManager.wrapMultiImage(ImageIO.read(new File("C:/Users/Samuel Caetano/Desktop/Recording/red.jpg")), 15, 10);
+            MapWrapper mapWrapper = mapManager.wrapMultiImage(robot.createScreenCapture(new Rectangle(1920, 1080)), 15, 10);
             MultiMapController mapController = (MultiMapController)mapWrapper.getController();
             mapController.addViewer(player);
             mapController.sendContent(player);
