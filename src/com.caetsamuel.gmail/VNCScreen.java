@@ -17,6 +17,7 @@ import org.inventivetalent.mapmanager.controller.MultiMapController;
 import org.inventivetalent.mapmanager.manager.MapManager;
 import org.inventivetalent.mapmanager.wrapper.MapWrapper;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.io.File;
 import java.util.ArrayList;
@@ -98,12 +99,15 @@ public class VNCScreen implements Runnable {
         }
 
         try {
-
+//robot.createScreenCapture(new Rectangle(1920, 1080))
             Player player = Bukkit.getPlayer("SecondAmendment");
-            MapWrapper mapWrapper = mapManager.wrapMultiImage(robot.createScreenCapture(new Rectangle(1920, 1080)), 10, 15);
+            MapWrapper mapWrapper = mapManager.wrapMultiImage(ImageIO.read(new File("C:/Users/Samuel Caetano/Desktop/Recording/red.jpg")), 15, 10);
             MultiMapController mapController = (MultiMapController)mapWrapper.getController();
             mapController.addViewer(player);
             mapController.sendContent(player);
+
+            System.out.println("Frames.length = " + frames.length);
+            System.out.println("Frames[0].length = " + frames[0].length);
 
             for (int r = 0; r<frames.length; r++){
                 for (int c = 0; c<frames[0].length; c++){
@@ -114,7 +118,9 @@ public class VNCScreen implements Runnable {
                 }
             }
 
+            System.out.println("GOT TO THIS POINT!");
             mapController.showInFrames(player, frames);
+            System.out.println("IF YOU DONT SEE THIS IT MEANS THE FRAMES WERE NEVER SHOWN!");
 
             /*
             for(ItemFrame f : frames){
