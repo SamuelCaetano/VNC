@@ -9,14 +9,13 @@ import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
 
 import org.inventivetalent.mapmanager.MapManagerPlugin;
+import org.inventivetalent.mapmanager.controller.MapController;
 import org.inventivetalent.mapmanager.controller.MultiMapController;
 import org.inventivetalent.mapmanager.manager.MapManager;
 import org.inventivetalent.mapmanager.wrapper.MapWrapper;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
 
 public class VNCScreen implements Runnable {
 
@@ -34,7 +33,7 @@ public class VNCScreen implements Runnable {
     private int columns = (int)Math.ceil(width/128.0);
 
     private ItemFrame[][] frames = new ItemFrame[rows][columns];
-    private int[][] itemFrameIds = new int[rows][columns];
+    private int[][] itemFrameIds = new int[columns][rows];
 
     private final double FRAME_CAP = 1.0/70.0;//70 FPS
 
@@ -56,46 +55,28 @@ public class VNCScreen implements Runnable {
         //robot.createScreenCapture(new Rectangle(1400, 810))
         //ImageIO.read(new File(""))
 
-        try {
-            final Player player = Bukkit.getPlayer("SecondAmendment");
-            BufferedImage originalimage = robot.createScreenCapture(new Rectangle(1536, 864));
-            BufferedImage image = scaleImage(originalimage);
-            File testfile1 = new File("C:/Users/Samuel Caetano/Desktop/Recording/screen1.jpg");
-            ImageIO.write(image, "jpg", testfile1);
-            File testfile2 = new File("C:/Users/Samuel Caetano/Desktop/Recording/screen2.jpg");
-            ImageIO.write(originalimage, "jpg", testfile2);
-            final MapWrapper mapWrapper = mapManager.wrapMultiImage(image, rows, columns);
-            final MultiMapController mapController = (MultiMapController)mapWrapper.getController();
-            mapController.addViewer(player);
-            mapController.sendContent(player);
+        BufferedImage image = scaleImage(robot.createScreenCapture(new Rectangle(1536, 864)));
 
-            for (int c = 0; c<columns; c++){
-                for (int r = 0; r<rows; r++){
-                    System.out.println("Rows: " + r + "Columns: " + c);
-                    ItemStack map = new ItemStack(Material.MAP);
-                    map.setDurability(mapController.getMapId(Bukkit.getOfflinePlayer(player.getUniqueId())));
-                    frames[r][c].setItem(map);
-                }
+        final Player player = Bukkit.getPlayer("SecondAmendment");
+
+        final MapWrapper mapWrapper = mapManager.wrapMultiImage(image, rows, columns);
+        final MultiMapController mapController = (MultiMapController) mapWrapper.getController();
+
+        mapController.addViewer(player);
+        mapController.sendContent(player);
+
+        setMaps(mapController);
+
+        mapController.showInFrames(player, itemFrameIds);
+
+        Bukkit.getScheduler().runTaskLater(VNCraft.getInstance(), new Runnable() {
+            @Override
+            public void run() {
+                BufferedImage image2 = scaleImage(robot.createScreenCapture(new Rectangle(1536, 864)));
+
+                mapController.update(image2);
             }
-
-            Bukkit.getServer().getScheduler().runTaskLater(VNCraft.getInstance(), new Runnable() {
-                public void run() {
-                    mapController.showInFrames(player, frames);
-                }
-            }, 200L);
-
-            /*
-            for(ItemFrame f : frames){
-                ItemStack mapStack = new ItemStack(Material.MAP);
-                ItemStack map = new ItemStack(Material.MAP);
-                map.setDurability(mapController.getMapId(Bukkit.getOfflinePlayer(player.getUniqueId())));
-                f.setItem(map);
-                mapController.showInFrame(player, f, true);
-
-            }*/
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        }, 200L);
         //start();
     }
 
@@ -185,7 +166,7 @@ public class VNCScreen implements Runnable {
                     frame = world.spawn(loc.getBlock().getRelative(bf).getLocation(), ItemFrame.class);
 
                     frames[row][column] = frame;
-                    itemFrameIds[row][column] = frame.getEntityId();
+                    itemFrameIds[column][row] = frame.getEntityId();
 
                     if(row < rows - 1){
                         row++;
@@ -199,7 +180,22 @@ public class VNCScreen implements Runnable {
         }
     }
 
-    BufferedImage scaleImage(BufferedImage original) {
+    public void setMaps(MapController mapController){
+        try {
+            for (int c = 0; c < columns; c++) {
+                for (int r = 0; r < rows; r++) {
+                    System.out.println("Rows: " + r + "Columns: " + c);
+                    ItemStack map = new ItemStack(Material.MAP);
+                    map.setDurability(mapController.getMapId(Bukkit.getOfflinePlayer(Bukkit.getServer().getPlayer("SecondAmendment").getUniqueId())));
+                    frames[r][c].setItem(map);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    private BufferedImage scaleImage(BufferedImage original) {
         if (original.getWidth() % 128 == 0 && original.getHeight() % 128 == 0) {
             return original;
         }
@@ -218,5 +214,4 @@ public class VNCScreen implements Runnable {
         scaledGraphics.dispose();
         return scaledImage;
     }
-
 }
