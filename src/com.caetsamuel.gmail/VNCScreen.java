@@ -35,7 +35,13 @@ public class VNCScreen implements Runnable {
     private ItemFrame[][] frames = new ItemFrame[rows][columns];
     private int[][] itemFrameIds = new int[columns][rows];
 
-    private final double FRAME_CAP = 1.0/70.0;//70 FPS
+    private final double FRAME_CAP = 1.0/1.0;//1 FPS
+
+    private final MapWrapper mapWrapper;
+
+    private final MultiMapController mapController;
+
+    private final Player viewer;
 
     private Robot robot;
 
@@ -51,32 +57,27 @@ public class VNCScreen implements Runnable {
         world = f1.getWorld();
 
         addFrames(f1, f2, bf);
-
-        //robot.createScreenCapture(new Rectangle(1400, 810))
-        //ImageIO.read(new File(""))
-
+        //Set a starter image (to generate a map to put in the itemframe (you will be updating this image later using mapController.update(image)))
         BufferedImage image = scaleImage(robot.createScreenCapture(new Rectangle(1536, 864)));
 
-        final Player player = Bukkit.getPlayer("SecondAmendment");
+        viewer = Bukkit.getPlayer("SecondAmendment");
 
-        final MapWrapper mapWrapper = mapManager.wrapMultiImage(image, rows, columns);
-        final MultiMapController mapController = (MultiMapController) mapWrapper.getController();
+        mapWrapper = mapManager.wrapMultiImage(image, rows, columns);
+        mapController = (MultiMapController) mapWrapper.getController();
 
-        mapController.addViewer(player);
-        mapController.sendContent(player);
+        mapController.addViewer(viewer);
+        mapController.sendContent(viewer);
 
         setMaps(mapController);
 
-        mapController.showInFrames(player, itemFrameIds);
+        mapController.showInFrames(viewer, itemFrameIds);
 
-        Bukkit.getScheduler().runTaskLater(VNCraft.getInstance(), new Runnable() {
-            @Override
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(VNCraft.getInstance(), new Runnable() {
             public void run() {
-                BufferedImage image2 = scaleImage(robot.createScreenCapture(new Rectangle(1536, 864)));
-
-                mapController.update(image2);
+                mapController.update(scaleImage(robot.createScreenCapture(new Rectangle(1536, 864))));
             }
-        }, 200L);
+        }, 0L, 20L);
+
         //start();
     }
 
@@ -110,13 +111,11 @@ public class VNCScreen implements Runnable {
             {
                 unprocessedTime -= FRAME_CAP;
                 render = true;
-
-                //Obtain Screen Updates
             }
 
             if(render){
                 //Render Screen Update
-
+                mapController.update(scaleImage(robot.createScreenCapture(new Rectangle(1536, 864))));
             }
             else{
                 try{
