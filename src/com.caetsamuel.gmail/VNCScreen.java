@@ -7,20 +7,16 @@ import org.bukkit.World;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.*;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.map.MapCanvas;
-import org.bukkit.map.MapCursorCollection;
-import org.bukkit.map.MapFont;
-import org.bukkit.map.MapView;
+
 import org.inventivetalent.mapmanager.MapManagerPlugin;
-import org.inventivetalent.mapmanager.controller.MapController;
 import org.inventivetalent.mapmanager.controller.MultiMapController;
 import org.inventivetalent.mapmanager.manager.MapManager;
 import org.inventivetalent.mapmanager.wrapper.MapWrapper;
 
 import javax.imageio.ImageIO;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.File;
-import java.util.ArrayList;
 
 public class VNCScreen implements Runnable {
 
@@ -31,11 +27,16 @@ public class VNCScreen implements Runnable {
     private boolean render = false;
     private boolean running = false;
 
-    private ItemFrame[][] frames = new ItemFrame[10][15];
+    private int width = 1920;
+    private int height = 1080;
+
+    private int rows = (int)Math.ceil(height/128.0);
+    private int columns = (int)Math.ceil(width/128.0);
+
+    private ItemFrame[][] frames = new ItemFrame[rows][columns];
+    private int[][] itemFrameIds = new int[rows][columns];
 
     private final double FRAME_CAP = 1.0/70.0;//70 FPS
-
-    private File file;
 
     private Robot robot;
 
@@ -50,66 +51,26 @@ public class VNCScreen implements Runnable {
 
         world = f1.getWorld();
 
-        System.out.println("Spawning FRAMES!");
+        addFrames(f1, f2, bf);
 
-        int minX = Math.min(f1.getBlockX(), f2.getBlockX());
-        int maxX = Math.max(f1.getBlockX(), f2.getBlockX());
-        int minY = Math.min(f1.getBlockY(), f2.getBlockY());
-        int maxY = Math.max(f1.getBlockY(), f2.getBlockY());
-        int minZ = Math.min(f1.getBlockZ(), f2.getBlockZ());
-        int maxZ = Math.max(f1.getBlockZ(), f2.getBlockZ());
-
-        Location loc = new Location(world,0, 0, 0);
-
-        int row = 0;
-        int column = 0;
-
-        //Add Frames
-        for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
-                for (int z = minZ; z <= maxZ; z++) {
-                    loc.setX(x);
-                    loc.setY(y);
-                    loc.setZ(z);
-
-                    ItemFrame frame;
-
-                    world.getBlockAt(loc.getBlock().getRelative(bf).getLocation()).setType(Material.AIR);
-
-                    /*
-                    for (Entity entity : world.getNearbyEntities(loc, 2, 2, 2)) {
-                        if (entity instanceof ItemFrame && entity.getLocation().getBlock().getRelative(((ItemFrame) entity).getAttachedFace()).equals(world.getBlockAt(loc))) {
-                            frame = (ItemFrame) entity;
-                            System.out.println("SKIPPING frame at: " + frame.getLocation().toString());
-                        }
-                     */
-                    frame = world.spawn(loc.getBlock().getRelative(bf).getLocation(), ItemFrame.class);
-
-                    frames[row][column] = frame;
-
-                    if(row < 9){
-                        row++;
-                    }
-                    else if(column < 14){
-                        row = 0;
-                        column++;
-                    }
-                }
-            }
-        }
+        //robot.createScreenCapture(new Rectangle(1400, 810))
+        //ImageIO.read(new File(""))
 
         try {
-            Player player = Bukkit.getPlayer("SecondAmendment");
-            MapWrapper mapWrapper = mapManager.wrapMultiImage(robot.createScreenCapture(new Rectangle(1920, 1080)), 15, 10);
-            MultiMapController mapController = (MultiMapController)mapWrapper.getController();
+            final Player player = Bukkit.getPlayer("SecondAmendment");
+            BufferedImage originalimage = robot.createScreenCapture(new Rectangle(1536, 864));
+            BufferedImage image = scaleImage(originalimage);
+            File testfile1 = new File("C:/Users/Samuel Caetano/Desktop/Recording/screen1.jpg");
+            ImageIO.write(image, "jpg", testfile1);
+            File testfile2 = new File("C:/Users/Samuel Caetano/Desktop/Recording/screen2.jpg");
+            ImageIO.write(originalimage, "jpg", testfile2);
+            final MapWrapper mapWrapper = mapManager.wrapMultiImage(image, rows, columns);
+            final MultiMapController mapController = (MultiMapController)mapWrapper.getController();
             mapController.addViewer(player);
             mapController.sendContent(player);
 
-            System.out.println("Frames.length = " + frames.length);
-            System.out.println("Frames[0].length = " + frames[0].length);
-
-            for (int r = 0; r<frames.length; r++){
-                for (int c = 0; c<frames[0].length; c++){
+            for (int r = 0; r<rows; r++){
+                for (int c = 0; c<columns; c++){
                     System.out.println("Rows: " + r + "Columns: " + c);
                     ItemStack map = new ItemStack(Material.MAP);
                     map.setDurability(mapController.getMapId(Bukkit.getOfflinePlayer(player.getUniqueId())));
@@ -117,9 +78,11 @@ public class VNCScreen implements Runnable {
                 }
             }
 
-            System.out.println("GOT TO THIS POINT!");
-            mapController.showInFrames(player, frames);
-            System.out.println("IF YOU DONT SEE THIS IT MEANS THE FRAMES WERE NEVER SHOWN!");
+            Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(VNCraft.getInstance(), new Runnable() {
+                public void run() {
+                    mapController.showInFrames(player, frames);
+                }
+            }, 20L);
 
             /*
             for(ItemFrame f : frames){
@@ -188,11 +151,72 @@ public class VNCScreen implements Runnable {
     public Entity getEntityByLocation(Location loc){
         for(Entity e : loc.getWorld().getEntities()){
             if(e.getLocation().distanceSquared(loc) <= 1.0){
-                System.out.println("ANYTHING HERE: " + e.getType());
                 return e;
             }
         }
         return null;
+    }
+
+    public void addFrames(Location f1, Location f2, BlockFace bf){
+
+        int minX = Math.min(f1.getBlockX(), f2.getBlockX());
+        int maxX = Math.max(f1.getBlockX(), f2.getBlockX());
+        int minY = Math.min(f1.getBlockY(), f2.getBlockY());
+        int maxY = Math.max(f1.getBlockY(), f2.getBlockY());
+        int minZ = Math.min(f1.getBlockZ(), f2.getBlockZ());
+        int maxZ = Math.max(f1.getBlockZ(), f2.getBlockZ());
+
+        Location loc = new Location(world,0, 0, 0);
+
+        int row = 0;
+        int column = 0;
+
+        for (int x = minX; x <= maxX; x++) {
+            for (int y = minY; y <= maxY; y++) {
+                for (int z = minZ; z <= maxZ; z++) {
+                    loc.setX(x);
+                    loc.setY(y);
+                    loc.setZ(z);
+
+                    ItemFrame frame;
+
+                    world.getBlockAt(loc.getBlock().getRelative(bf).getLocation()).setType(Material.AIR);
+
+                    frame = world.spawn(loc.getBlock().getRelative(bf).getLocation(), ItemFrame.class);
+
+                    frames[row][column] = frame;
+                    itemFrameIds[row][column] = frame.getEntityId();
+
+                    if(row < rows - 1){
+                        row++;
+                    }
+                    else if(column < columns - 1){
+                        row = 0;
+                        column++;
+                    }
+                }
+            }
+        }
+    }
+
+    BufferedImage scaleImage(BufferedImage original) {
+        if (original.getWidth() % 128 == 0 && original.getHeight() % 128 == 0) {
+            return original;
+        }
+        int type = original.getType();
+        System.out.println("TYPE IS: " + type);
+        if (type == 0) {
+            type = 5; }
+
+        BufferedImage scaledImage = new BufferedImage(128 * this.columns, 128 * this.rows, type);
+        Graphics scaledGraphics = scaledImage.getGraphics();
+
+        Image instance = original.getScaledInstance(128 * this.columns, 128 * this.rows, Image.SCALE_FAST);
+        scaledGraphics.drawImage(instance, 0, 0, null);
+
+        instance.flush();
+        scaledGraphics.dispose();
+        return scaledImage;
     }
 
 }
