@@ -69,8 +69,8 @@ public class VNCScreen implements Runnable {
             mapController.addViewer(player);
             mapController.sendContent(player);
 
-            for (int r = 0; r<rows; r++){
-                for (int c = 0; c<columns; c++){
+            for (int c = 0; c<columns; c++){
+                for (int r = 0; r<rows; r++){
                     System.out.println("Rows: " + r + "Columns: " + c);
                     ItemStack map = new ItemStack(Material.MAP);
                     map.setDurability(mapController.getMapId(Bukkit.getOfflinePlayer(player.getUniqueId())));
@@ -78,11 +78,11 @@ public class VNCScreen implements Runnable {
                 }
             }
 
-            Bukkit.getServer().getScheduler().scheduleAsyncDelayedTask(VNCraft.getInstance(), new Runnable() {
+            Bukkit.getServer().getScheduler().runTaskLater(VNCraft.getInstance(), new Runnable() {
                 public void run() {
                     mapController.showInFrames(player, frames);
                 }
-            }, 20L);
+            }, 200L);
 
             /*
             for(ItemFrame f : frames){
@@ -172,7 +172,7 @@ public class VNCScreen implements Runnable {
         int column = 0;
 
         for (int x = minX; x <= maxX; x++) {
-            for (int y = minY; y <= maxY; y++) {
+            for (int y = maxY; y >= minY; y--) {
                 for (int z = minZ; z <= maxZ; z++) {
                     loc.setX(x);
                     loc.setY(y);
